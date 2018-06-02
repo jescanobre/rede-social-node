@@ -11,8 +11,8 @@ module.exports = function(){
             required: true
         },
         uid: {
-            type: String,
-            required: true
+            type: mongoose.Schema.ObjectId,
+            ref: 'Usuario'
         }
     });
     return mongoose.model('Post', schema);

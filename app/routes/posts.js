@@ -1,4 +1,5 @@
 let controller = require("../controllers/posts");
+let auth = require('../controllers/auth');
 
 module.exports = function(app) {
     app.get('/api/posts', controller.listarPosts);
@@ -6,5 +7,5 @@ module.exports = function(app) {
     app.post('/api/posts', controller.inserirPost);
     app.delete('/api/posts/:id', controller.deletarPost);
     app.put('/api/posts/:id', controller.updatePost);
-    app.get('/api/posts/:id/usuario', controller.usuarioPost);
+    app.get('/api/posts/:id/uid', controller.usuarioPost);
 }

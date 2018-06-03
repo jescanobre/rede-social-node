@@ -1,3 +1,5 @@
+let bcrypt = require('bcrypt');
+let jwt = require('jsonwebtoken');
 let Usuario = require('../models/usuarios.js');
 let Post = require('../models/posts.js');
 
@@ -36,13 +38,17 @@ module.exports.inserirUsuario = function(req, res) {
     let usuario = new Usuario({
         nome: req.body.nome, 
         email: req.body.email,
-        senha: bcrypt.hashSync (req.body.senha, 10)
+        senha: bcrypt.hashSync(req.body.senha, 10)
     });
-    let promise = Usuario.create(req.body);
+    let promise = Usuario.create(usuario);
     promise.then(
         function(usuario){
             console.log(usuario);
-            res.status(201).json(usuario);
+            res.status(201).json({
+                id: usuario._id, 
+                nome: usuario.nome,
+                email: usuario.email
+            });
         }
     ).catch(
         function(error){
@@ -52,11 +58,12 @@ module.exports.inserirUsuario = function(req, res) {
 }
 
 module.exports.deletarUsuario = function(req, res) {
-    let id = req.params.id;
-    let promise = Usuario.remove({"_id":id}).exec();
+    let payload = jwt.decode(req.query.token);
+    //let id = req.params.id;
+    let promise = Usuario.remove({"_id":payload.id}).exec();
     promise.then(
         function(usuario){
-            res.status(201).json(usuario);
+            res.status(201).send("Usuário removido!");
         }
     ).catch(
         function(){
@@ -66,14 +73,17 @@ module.exports.deletarUsuario = function(req, res) {
 }
 
 module.exports.updateUsuario = function(req, res) {
-    let id = req.params.id;
+    let payload = jwt.decode(req.query.token);
+    // let id = req.params.id;
     let usuario = new Usuario ({
-        _id: id, 
+        _id: payload.id, 
         nome: req.body.nome,
         email: req.body.email, 
         senha: req.body.senha
+
     })
-    let promise = Usuario.findByIdAndUpdate(id, usuario).exec();
+
+    let promise = Usuario.findByIdAndUpdate(payload.id, req.body).exec();
     promise.then(
         function(usuario){
             res.status(201).json({
@@ -95,7 +105,7 @@ module.exports.postsUsuario = function(req, res) {
     let promise = Post.find({"uid": id}).exec();
     promise.then(
         function(posts){
-            res.json(posts);
+            res.status(200).json(posts);
         }
     ).catch(
         function(error){

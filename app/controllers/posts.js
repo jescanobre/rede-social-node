@@ -51,9 +51,7 @@ module.exports.inserirPost = function(req, res) {
 
 module.exports.deletarPost = function(req, res) {
     let id = req.params.id;
-
     let payload = jwt.decode(req.query.token);
-
     let promise = Post.remove({"_id":id}).exec();
     promise.then(
         function(post){
@@ -86,9 +84,9 @@ module.exports.updatePost = function(req, res) {
     promise.then(
         function(post){
             if(req.body.uid == payload.id){
-                res.status(201).json(post);
+                res.status(200).json(post);
             }else{
-                res.status(404).send("Usuario inválido");
+                res.status(500).send("Usuario inválido");
             }
         }
     ).catch(

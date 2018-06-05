@@ -21,8 +21,8 @@ module.exports.obterUsuario = function(req, res) {
     let promise = Usuario.findById(id).exec();
     promise.then(
         function(usuario){
-            res.json({
-                id: usuario.id, 
+            res.status(200).json({
+                id: usuario._id, 
                 nome: usuario.nome,
                 email: usuario.email
             });
@@ -59,7 +59,7 @@ module.exports.inserirUsuario = function(req, res) {
 
 module.exports.deletarUsuario = function(req, res) {
     let payload = jwt.decode(req.query.token);
-    //let id = req.params.id;
+
     let promise = Usuario.remove({"_id":payload.id}).exec();
     promise.then(
         function(usuario){
@@ -74,6 +74,7 @@ module.exports.deletarUsuario = function(req, res) {
 
 module.exports.updateUsuario = function(req, res) {
     let payload = jwt.decode(req.query.token);
+    console.log(payload);
     // let id = req.params.id;
     let usuario = new Usuario ({
         _id: payload.id, 

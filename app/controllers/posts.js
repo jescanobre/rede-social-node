@@ -50,20 +50,17 @@ module.exports.inserirPost = function(req, res) {
 }
 
 module.exports.deletarPost = function(req, res) {
-    let id = req.params.id;
-    let payload = jwt.decode(req.query.token);
-    let promise = Post.remove({"_id":id}).exec();
+    let idReq = req.params.id;
+    let token = req.query.token;
+    let payload = jwt.decode(token).id;
+
+    let promise = Post.findByIdAndRemove({_id:idReq, id:payload});
     promise.then(
         function(post){
-            if(req.body.uid == payload.id){
-                res.status(201).json("Post removido!");
-            }else{
-                res.status(404).send("Usuario inválido");
-            }
-        }
-    ).catch(
-        function(){
-            res.status(404).send("Post não encontrado.");
+            res.status(201).json("Post removido!"); 
+        },
+        function(erro){
+            res.status(500).send("Usuario inválido");
         }
     )
 }
@@ -71,26 +68,31 @@ module.exports.deletarPost = function(req, res) {
 module.exports.updatePost = function(req, res) {
     let id = req.params.id;
 
-    let post = new Post ({
+    let post_atualizado = new Post({
         _id: id, 
         texto: req.body.texto,
         likes: req.body.likes, 
-        uid: req.body.uid
-    })
+        uid: req.body.uid,
+
+    });
 
     let payload = jwt.decode(req.query.token);
 
-    let promise = Post.findByIdAndUpdate(id, post).exec();
-    promise.then(
+    let promise1 = Post.findById(id);   
+    promise1.then(
         function(post){
-            if(req.body.uid == payload.id){
-                res.status(200).json(post);
+            if(req.body.uid == payload._id){
+                let promise2 =  Post.findByIdAndUpdate(post.id, post_atualizado).then(
+                    function(post){
+                        res.status(200).json("Post atualizado! "+ post);
+                    }
+                )
             }else{
                 res.status(500).send("Usuario inválido");
             }
         }
     ).catch(
-        function(){
+        function(erro){
             res.status(404).send("Post não encontrado.");
         }
     )
@@ -108,4 +110,4 @@ module.exports.usuarioPost = function(req, res) {
             res.status(404).send("Usuário não tem posts.");
         }
     )
-}
+};

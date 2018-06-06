@@ -7,7 +7,7 @@ module.exports = function(app) {
     app.get('/api/usuarios', controller.listarUsuarios);
     app.use('/api/usuarios/', auth.verificarToken);
     app.get('/api/usuarios/:id', controller.obterUsuario);
-    app.put('/api/usuarios', controller.updateUsuario);
+    app.put('/api/usuarios/:id', controller.updateUsuario);
     app.delete('/api/usuarios/:id', controller.deletarUsuario);
     app.get('/api/usuarios/:id/posts', controller.postsUsuario);
 }
